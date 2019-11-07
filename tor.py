@@ -6,6 +6,7 @@ from stem import Signal
 from stem.control import Controller
 import json
 from threading import Thread
+import time
 
 class IpAddrError(Exception):
     """An exception indicating that something went wrong finding an IP
@@ -111,6 +112,8 @@ HashedControlPassword %(hashed_pw)s
 
         t = Thread(target=run_tor)
         t.start()
+        while  not self.started:
+            time.sleep(1)
 
     def tor_session(self):
         """Returns a requests.session using tor's socks port
@@ -211,35 +214,15 @@ if __name__ == "__main__":
     
     tor_password = random_pw(100) # input("Tor control password> ")
     
-    # run commands that use all the methods of the Tor() object
+    # start Tor on port 9150 with control listener on the default port
+    # 9051
     with Tor(tor_password, socks_port=9150) as tor:
 
         print("Starting Tor")
         tor.start()
 
-        while not tor.tor_process:
-            pass
+        print("Tor is started.  Ctrl-C to exit >")
 
-        try:
-            while  not tor.started:
-                print("Waiting for Tor to start")
-                time.sleep(1)
-        except KeyboardInterrupt:
-            tor.tor_process.terminate()
-            exit()
-
-        print("Checking if Tor is working")
-
-        if tor.is_working():
-            print("Tor is working")
-        else:
-            print("Tor IP address is same as local")
-
-        t = tor.tor_session().get("http://start.duckduckgo.com").text
-
-        print(t.encode("utf-8"))
-        print("Old Tor IP address: %s" % tor.tor_ip_address())
-
-        tor.ensure_reroute_connection()
-
-        print("New Tor IP address: %s" % tor.tor_ip_address())
+        while True:
+            time.sleep(1)
+            

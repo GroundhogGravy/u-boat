@@ -5,7 +5,7 @@ import os.path
 class MessageEndecryptor(gnupg.GPG):
     def __init__(self, mail2news,
                  remailers,
-                 gnupghome="~/.secure-messaging"):
+                 gnupghome):
         
         gnupg.GPG.__init__(
             self,
@@ -88,7 +88,9 @@ Anon-To: %s
 
 
 if __name__ == "__main__":
-
+    from configure import get_config
+    
     encryptor = MessageEndecryptor("mail2news@dizum.com",
-                          [])
+                                   [],
+                                   get_config()["gpg-dir"])
     print(encryptor.recipients())

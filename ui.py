@@ -295,21 +295,28 @@ class UBoatMainWindow(QMainWindow):
 if __name__ == "__main__":
 
     import sys
+    from tor import Tor
     from encryption import MessageEndecryptor
     from tor_smtp import TorSMTP
+    from random_pw import random_pw
+    pw = random_pw(50)
     
-    endecryptor = MessageEndecryptor("mail2news",
-                                     [],
-                                     gnupghome="~/.gnupg")
-                          
-    app = QApplication(sys.argv)
-    sender = TorSMTP("smtp.fastmail.com",
-                     465,
-                     proxy_port=9150)
-                     
-    # mw = UBoatMainWindow()
-    # mw.messageViewRequested.connect(lambda m: print(m))
-    # mw.showMaximized()
-    nm = UBoatNewMessageWindow(endecryptor, sender)
-    nm.show()
-    sys.exit(app.exec_())
+    with  Tor(pw) as tor:
+        
+        tor.start()
+
+        endecryptor = MessageEndecryptor("mail2news",
+                                         [],
+                                         gnupghome="~/.gnupg")
+
+        app = QApplication(sys.argv)
+        sender = TorSMTP("smtp.fastmail.com",
+                         465)
+
+        mw = UBoatMainWindow()
+        mw.messageViewRequested.connect(lambda m: print(m))
+        mw.showMaximized()
+        # nm = UBoatNewMessageWindow(endecryptor, sender)
+        # nm.show()
+        
+        sys.exit(app.exec_())
