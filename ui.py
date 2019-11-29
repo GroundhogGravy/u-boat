@@ -27,11 +27,11 @@ def get_password(caption):
         return None
 
 
-class UBoatNewMessageWindow(QWidget):
-    """A window for composing a new message"""
+class UBoatNewMessageWindow(QDialog):
+    """A dialog window for composing a new message"""
     
-    def __init__(self, endecryptor, sender):
-        QWidget.__init__(self)
+    def __init__(self, endecryptor, sender, *args, **kwargs):
+        QDialog.__init__(self, *args, **kwargs)
 
         self.setMinimumSize(800, 480)
         self.setWindowTitle(app_name + ": New Message")
@@ -315,8 +315,12 @@ if __name__ == "__main__":
 
         mw = UBoatMainWindow()
         mw.messageViewRequested.connect(lambda m: print(m))
+
+        def show_compose(*args, **kwargs):
+            nm = UBoatNewMessageWindow(endecryptor, sender)
+            nm.exec_()
+        
+        mw.composeClicked.connect(show_compose)
         mw.showMaximized()
-        # nm = UBoatNewMessageWindow(endecryptor, sender)
-        # nm.show()
         
         sys.exit(app.exec_())
